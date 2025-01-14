@@ -18,6 +18,9 @@ This repository contains the code I present in my talk "Stream Gatherers - Write
   - [JEP 461: Stream Gatherers (Preview)](https://openjdk.org/jeps/461)
   - [JEP 473: Stream Gatherers (Second Preview)](https://openjdk.org/jeps/473)
   - [JEP 485: Stream Gatherers](https://openjdk.org/jeps/485)
+
 ### Talks
   - [betterCode Java 2024](https://java.bettercode.eu/)
+  - [JUG Hamburg 2025](https://www.meetup.com/de-DE/jug-hamburg/events/305283055/)
+  - [JavaLand 2025](https://meine.doag.org/events/javaland/2025/agenda/#agendaId.5188)
   - [XtremeJ 2025](https://xtremej.dev/2025/) 
