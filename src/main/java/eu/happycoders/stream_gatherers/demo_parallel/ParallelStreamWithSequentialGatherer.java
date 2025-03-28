@@ -4,39 +4,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.LongAdder;
+
+import static java.io.IO.println;
 
 class ParallelStreamWithSequentialGatherer {
+
   void main() {
     List<String> words = new ArrayList<>();
-    for (int i = 0; i < 150; i++) {
+    for (int i = 0; i < 1_000; i++) {
       words.add(String.valueOf(i));
     }
 
     Set<String> threadNamesFirstMapping = ConcurrentHashMap.newKeySet();
-    Set<String> threadNamesGatherer = ConcurrentHashMap.newKeySet();
+    ThreadNameCollector threadNamesGatherer = new ThreadNameCollector();
     Set<String> threadNamesSecondMapping = ConcurrentHashMap.newKeySet();
-    LongAdder windowsCounter = new LongAdder();
 
     List<Integer> list = words.parallelStream()
+
+        // intermediate operation 1: parallel mapping
         .map(x -> {
           threadNamesFirstMapping.add(Thread.currentThread().getName());
           return x.length();
         })
+
+        // intermediate operation 2: sequential gatherer
         .gather(DemoGatherers.windowFixed(10, threadNamesGatherer))
+
+        // intermediate operation 3: parallel mapping
         .map(x -> {
-          windowsCounter.increment();
           threadNamesSecondMapping.add(Thread.currentThread().getName());
           return x.size();
         })
         .toList();
 
-    System.out.println("list = " + list);
+    println("list = " + list);
 
-    System.out.println("threadNamesFirstMapping.size()  = " + threadNamesFirstMapping.size());
-    System.out.println("threadNamesGatherer.size()      = " + threadNamesGatherer.size());
-    System.out.println("threadNamesGatherer             = " + threadNamesGatherer);
-    System.out.println("windowsCounter.sum()            = " + windowsCounter.sum());
-    System.out.println("threadNamesSecondMapping.size() = " + threadNamesSecondMapping.size());
+    println("Number of threads op 1, parallel mapping:     %2d".formatted(threadNamesFirstMapping.size()));
+    println("Number of threads op 2, sequential gathering: %2d (threads: %s)"
+        .formatted(threadNamesGatherer.numberOfThreads(), threadNamesGatherer.threadSwitches()));
+    println("Number of threads op 3, parallel mapping:     %2d".formatted(threadNamesSecondMapping.size()));
   }
 }

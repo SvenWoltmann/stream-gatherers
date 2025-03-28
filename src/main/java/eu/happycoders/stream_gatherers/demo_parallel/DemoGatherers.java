@@ -2,7 +2,6 @@ package eu.happycoders.stream_gatherers.demo_parallel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -14,18 +13,17 @@ final class DemoGatherers {
   }
 
   static <T> Gatherer<T, List<T>, List<T>> windowFixed(int windowSize,
-                                                       Set<String> threadNamesCollector) {
+                                                       ThreadNameCollector threadNamesCollector) {
     AtomicBoolean inTheIntegrator = new AtomicBoolean();
 
-    // Initializer
     Supplier<List<T>> initializer = ArrayList::new;
 
-    // Integrator
     Gatherer.Integrator<List<T>, T, List<T>> integrator =
         Gatherer.Integrator.ofGreedy(
             (state, element, downstream) -> {
+              // Assert that only one thread at a time enters the integrate() method
               if (inTheIntegrator.compareAndExchange(false, true)) {
-                throw new IllegalStateException();
+                throw new AssertionError("Sequential gatherer's integrate() method entered by second thread");
               }
 
               threadNamesCollector.add(Thread.currentThread().getName());
@@ -38,13 +36,10 @@ final class DemoGatherers {
                 result = true;
               }
 
-              if (!inTheIntegrator.compareAndExchange(true, false)) {
-                throw new IllegalStateException();
-              }
+              inTheIntegrator.set(false);
               return result;
             });
 
-    // Finisher
     BiConsumer<List<T>, Gatherer.Downstream<? super List<T>>> finisher =
         (state, downstream) -> {
           if (!state.isEmpty()) {
@@ -54,5 +49,4 @@ final class DemoGatherers {
 
     return Gatherer.ofSequential(initializer, integrator, finisher);
   }
-
 }

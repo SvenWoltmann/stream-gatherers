@@ -6,7 +6,7 @@ This repository contains the code I present in my talk "Stream Gatherers - Write
 ## Links
 
 ### Talk Slides and Articles
-- [Slides and feedback form (German)](https://www.happycoders.eu/de/stream-gatherers-links/)
+- [Slides (German)](https://www.happycoders.eu/de/stream-gatherers-links/)
 - English Article: [Stream Gatherers – Write Your Own Stream Operations!](https://www.happycoders.eu/java/stream-gatherers/)
 - German Article: [Stream Gatherers – Schreibe deine eigenen Stream-Operationen!](https://www.happycoders.eu/de/java/stream-gatherers/)
 
