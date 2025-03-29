@@ -85,12 +85,7 @@ class ParallelStreamWithSequentialGatherer {
 
   private static void addResultToStatisticsMap(Set<String> threadNamesGatherStage, Map<String, Counter> statisticsMap) {
     int numberOfThreads = threadNamesGatherStage.size();
-    String key;
-    if (numberOfThreads == 1) {
-      key = threadNamesGatherStage.contains("main") ? "1 (main)" : "1 (worker)";
-    } else {
-      key = String.valueOf(numberOfThreads);
-    }
+    String key = String.valueOf(numberOfThreads);
     statisticsMap.computeIfAbsent(key, _ -> new Counter()).count++;
   }
 
