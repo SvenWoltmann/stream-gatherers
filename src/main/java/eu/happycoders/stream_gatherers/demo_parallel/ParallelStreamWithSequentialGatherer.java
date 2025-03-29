@@ -46,9 +46,7 @@ class ParallelStreamWithSequentialGatherer {
     ThreadLocal<Counter> perThreadCounterStage2 = ThreadLocal.withInitial(Counter::new);
     Counter globalCounterStage2 = new Counter();
 
-    ThreadLocal<Counter> perThreadCounterStage3 = ThreadLocal.withInitial(Counter::new);
-
-    List<ElementStage3> list = origin.parallelStream()
+    var list = origin.parallelStream()
 
         // intermediate operation 1: parallel mapping
         .map(x -> new ElementStage1(x, Thread.currentThread().getName(), perThreadCounterStage1.get().count++))
@@ -58,38 +56,30 @@ class ParallelStreamWithSequentialGatherer {
             x -> new ElementStage2(x, Thread.currentThread().getName(), perThreadCounterStage2.get().count++,
                 globalCounterStage2.count++)))
 
-        // intermediate operation 3: parallel mapping
-        .map(x -> new ElementStage3(x, Thread.currentThread().getName(), perThreadCounterStage3.get().count++))
-
         .toList();
 
     Set<String> threadNamesStage1 = new HashSet<>();
     Set<String> threadNamesStage2 = new HashSet<>();
-    Set<String> threadNamesStage3 = new HashSet<>();
 
     if (PRINT_RESULTS_OF_EACH_RUN) {
       println("list:");
-      for (ElementStage3 element : list) {
+      for (var element : list) {
         println("  " + element);
       }
     }
 
-    for (ElementStage3 element : list) {
+    for (var element : list) {
       threadNamesStage1.add(element.threadNameMapStage1());
       threadNamesStage2.add(element.threadNameGatherStage());
-      threadNamesStage3.add(element.threadNameMapStage3());
     }
 
     println("Number of threads stage 1, parallel   mapping:  %2d (%s)"
         .formatted(threadNamesStage1.size(), threadNamesStage1));
     println("Number of threads stage 2, sequential mapping:  %2d (%s)"
         .formatted(threadNamesStage2.size(), threadNamesStage2));
-    println("Number of threads stage 3, parallel   mapping:  %2d (%s)"
-        .formatted(threadNamesStage3.size(), threadNamesStage3));
 
     return threadNamesStage2;
   }
-
 
   private static void addResultToStatisticsMap(Set<String> threadNamesGatherStage, Map<String, Counter> statisticsMap) {
     int numberOfThreads = threadNamesGatherStage.size();
@@ -101,7 +91,6 @@ class ParallelStreamWithSequentialGatherer {
     }
     statisticsMap.computeIfAbsent(key, _ -> new Counter()).count++;
   }
-
 
   private static class Counter {
     private int count;
