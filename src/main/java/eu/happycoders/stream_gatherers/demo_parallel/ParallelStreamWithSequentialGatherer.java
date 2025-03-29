@@ -18,15 +18,22 @@ class ParallelStreamWithSequentialGatherer {
   void main() {
     List<Integer> origin = prepareOriginList();
 
-    Map<String, Counter> statisticsMap = new TreeMap<>(); // TreeMap to sort the result
+    Map<String, Counter> statisticsMapStage1 = new TreeMap<>(); // TreeMap to sort the result
+    Map<String, Counter> statisticsMapStage2 = new TreeMap<>();
     for (int i = 0; i < NUMBER_OF_RUNS; i++) {
-      Set<String> threadNamesGatherStage = runTest(i, origin);
-      addResultToStatisticsMap(threadNamesGatherStage, statisticsMap);
+      ThreadNames threadNames = runTest(i, origin);
+      addResultToStatisticsMap(threadNames.threadNamesStage1(), statisticsMapStage1);
+      addResultToStatisticsMap(threadNames.threadNamesStage2(), statisticsMapStage2);
     }
 
     println("\n---------- Overall statistics ----------");
+    println("Stage 1, parallel map()");
     println("# of threads");
-    statisticsMap.forEach((key, counter) -> println(
+    statisticsMapStage1.forEach((key, counter) -> println(
+        "%-10s -> %4d x (%5.2f %%)".formatted(key, counter.count, 100.0 * counter.count / NUMBER_OF_RUNS)));
+    println("\nStage 2, sequential mapping gatherer");
+    println("# of threads");
+    statisticsMapStage2.forEach((key, counter) -> println(
         "%-10s -> %4d x (%5.2f %%)".formatted(key, counter.count, 100.0 * counter.count / NUMBER_OF_RUNS)));
   }
 
@@ -38,7 +45,7 @@ class ParallelStreamWithSequentialGatherer {
     return origin;
   }
 
-  private Set<String> runTest(int i, List<Integer> origin) {
+  private ThreadNames runTest(int i, List<Integer> origin) {
     println("\n---------- Round %d ----------".formatted(i));
 
     ThreadLocal<Counter> perThreadCounterStage1 = ThreadLocal.withInitial(Counter::new);
@@ -78,7 +85,10 @@ class ParallelStreamWithSequentialGatherer {
     println("Number of threads stage 2, sequential mapping:  %2d (%s)"
         .formatted(threadNamesStage2.size(), threadNamesStage2));
 
-    return threadNamesStage2;
+    return new ThreadNames(threadNamesStage1, threadNamesStage2);
+  }
+
+  record ThreadNames(Set<String> threadNamesStage1, Set<String> threadNamesStage2) {
   }
 
   private static void addResultToStatisticsMap(Set<String> threadNamesGatherStage, Map<String, Counter> statisticsMap) {
