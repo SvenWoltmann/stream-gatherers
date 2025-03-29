@@ -1,11 +1,11 @@
 package eu.happycoders.stream_gatherers.demo_parallel;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import static java.io.IO.println;
 
@@ -16,7 +16,7 @@ class ParallelStreamWithSequentialGatherer {
   private static final boolean PRINT_RESULTS_OF_EACH_RUN = false;
 
   void main() {
-    List<Integer> origin = prepareOriginList();
+    List<Integer> origin = IntStream.range(0, NUMBER_OF_ELEMENTS_PER_RUN).boxed().toList();
 
     Map<String, Counter> statisticsMapStage1 = new TreeMap<>(); // TreeMap to sort the result
     Map<String, Counter> statisticsMapStage2 = new TreeMap<>();
@@ -35,14 +35,6 @@ class ParallelStreamWithSequentialGatherer {
     println("# of threads");
     statisticsMapStage2.forEach((key, counter) -> println(
         "%-10s -> %4d x (%5.2f %%)".formatted(key, counter.count, 100.0 * counter.count / NUMBER_OF_RUNS)));
-  }
-
-  private static List<Integer> prepareOriginList() {
-    List<Integer> origin = new ArrayList<>();
-    for (int i = 0; i < NUMBER_OF_ELEMENTS_PER_RUN; i++) {
-      origin.add(i);
-    }
-    return origin;
   }
 
   private ThreadNames runTest(int i, List<Integer> origin) {
