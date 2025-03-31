@@ -8,9 +8,9 @@ final class DemoGatherers {
   private DemoGatherers() {
   }
 
-  public static <T, R> Gatherer<T, ?, R> mapSequential(Function<T, R> mapper) {
+  static <T, R> Gatherer<T, ?, R> mapSequential(Function<T, R> mapper) {
     Gatherer.Integrator<Object, T, R> integrator =
-        Gatherer.Integrator.ofGreedy((object, element, downstream) -> {
+        Gatherer.Integrator.of((object, element, downstream) -> {
           R mappedElement = mapper.apply(element);
           return downstream.push(mappedElement);
         });
