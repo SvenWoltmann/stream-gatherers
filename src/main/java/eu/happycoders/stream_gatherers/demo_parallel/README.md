@@ -1,5 +1,11 @@
 # Sequential Gatherer Called From Multiple Threads
 
+> **_NOTE:_**  
+> 
+> The status of this README does not yet include the observations that Simone and I made on the second evening of JChateau and which were incorporated into the session on the third day.
+>
+> I will update this README soon, but I probably won't get around to it until after JavaLand.
+
 ## Observation
 
 In most cases, a Stream Gatherer instantiated with `ofSequential()` is invoked from a single thread.
