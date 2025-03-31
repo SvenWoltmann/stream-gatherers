@@ -47,22 +47,84 @@ If we look at the parallel mapping only (with the second stage commented out), w
 
 With 100 elements, in most runs, the stream was processed by 5 to 8 threads.
 
-![](/img/demo_parallel/map_only_100.png)
+<img src="/img/demo_parallel/map_only_100.png" style="width:496px;"/>
 
-With 10,000 elements, in most runs, the stream was processed by 12 to 15 threads.
+With 10,000 elements, it was mostly processed by 12 to 15 threads.
 
-![](/img/demo_parallel/map_only_10000.png)
+<img src="/img/demo_parallel/map_only_10000.png" style="width:496px;"/>
 
-With 1,000,000 elements, in most runs, the stream was processed by 19 or 20 threads.
+And with 1,000,000 elements, it was mostly processed by 19 or 20 threads.
 
-![](/img/demo_parallel/map_only_1000000.v2.png)
+<img src="/img/demo_parallel/map_only_1000000.v2.png" style="width:496px;"/>
 
 Conclusion: The more objects go through the stream, the higher the probability that more threads are used (which makes sense).
 
 ### Two stages: parallel map() + sequential and greedy mapping gatherer
 
-TODO
+Now let's uncomment the second stage and repeat the tests...
+
+With 100 elements, the map operation (left part of the diagram) was, again, mostly processed by 5 to 8 threads.
+
+The sequential gatherer (right part of the diagram), which I would expect to run in one thread, runs in 1-3 threads:
+
+<img src="/img/demo_parallel/map_and_greedy_mapping_gatherer_100.png" style="width:991px;"/>
+
+Also with 10,000 elements, the first stage looks the same.
+
+The sequential gatherer, however, was processed by fewer threads – mostly by one thread only:
+
+<img src="/img/demo_parallel/map_and_greedy_mapping_gatherer_10000.png" style="width:991px;"/>
+
+With 1,000,000 elements, the first stage looks the same again.
+
+And the sequential gatherer was processed by ewen fewer threads – almost always by one thread only:
+
+<img src="/img/demo_parallel/map_and_greedy_mapping_gatherer_1000000.png" style="width:991px;"/>
+
+Observations:
+
+* Adding the sequential gatherer after the parallel `map()` stage does not change the behaviour of the `map()` stage. 
+* Contrary to the first stage, the sequential gatherer is processed by fewer threads the more elements the stream has to process.
 
 ### Two stages: parallel map() + sequential and non-greedy mapping gatherer
 
-TODO
+Now let's change the gatherer from greedy to non-greedy, and this time we start with 1,000,000 elements:
+
+The non-greedy gatherer results in both stages being executed by just one thread: 
+
+<img src="/img/demo_parallel/map_and_non_greedy_mapping_gatherer_1000000.png" style="width:991px;"/>
+
+... or so we thought at the beginning.
+
+But when we reduce the number of elements to 10,000, the picture changes to a probability distribution again:
+
+<img src="/img/demo_parallel/map_and_non_greedy_mapping_gatherer_10000.png" style="width:991px;"/>
+
+And with 100 elements, even more threads are used:
+
+<img src="/img/demo_parallel/map_and_non_greedy_mapping_gatherer_100.png" style="width:991px;"/>
+
+Observations:
+
+* Making the gatherer non-greedy results in each element being processed sequentially in both stages. This makes sense as the pipeline does not know in advance when it will be stopped.
+* Both stages are processed by more threads (though never concurrently) the fewer elements the stream has to process.
+
+### Comparing Runtimes
+
+The processing of all elements took the following times (median over 10,000 runs in each case):
+
+* 100 elements: 
+  * greedy: 41.2 µs
+  * non-greedy: 41.2 µs &rarr; no difference
+
+* 10,000 elements:
+    * non-greedy: 295.4 µs
+    * greedy: 198.9 µs &rarr; faster by a factor of 1.5
+
+* 1,000,000 elements:
+    * greedy: 21,349 µs
+    * non-greedy: 10,335 µs &rarr; faster by factor 2
+
+Using `ofGreedy()` can result in a significant performance overhead. Therefore, you should always make sure that you use `ofGreedy()` if appropriate.
+
+The question remains why the stream pipeline sometimes decides to run the sequential gatherer on multiple threads (sequentially).
