@@ -114,17 +114,17 @@ Observations:
 The processing of all elements took the following times (median over 10,000 runs in each case):
 
 * 100 elements: 
-  * greedy: 41.2 µs
-  * non-greedy: 41.2 µs &rarr; no difference
+  * non-greedy: 41.2 µs
+  * greedy: 41.2 µs &rarr; no difference
 
 * 10,000 elements:
     * non-greedy: 295.4 µs
     * greedy: 198.9 µs &rarr; faster by a factor of 1.5
 
 * 1,000,000 elements:
-    * greedy: 21,349 µs
-    * non-greedy: 10,335 µs &rarr; faster by factor 2
+    * non-greedy: 21,349 µs
+    * greedy: 10,335 µs &rarr; faster by factor 2
 
-Using `ofGreedy()` can result in a significant performance overhead. Therefore, you should always make sure that you use `ofGreedy()` if appropriate.
+Using `ofGreedy()` can result in a significant performance improvement. Therefore, you should always make sure that you use `ofGreedy()` if appropriate.
 
 The question remains why the stream pipeline sometimes decides to run the sequential gatherer on multiple threads (sequentially).
