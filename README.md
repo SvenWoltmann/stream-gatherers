@@ -25,4 +25,5 @@ This repository contains the code I present in my talk "Stream Gatherers - Write
   - [[2025-01-15] JUG Hamburg](https://www.meetup.com/de-DE/jug-hamburg/events/305283055/)
   - [[2025-03-13] entwickler.de: 30 Jahre Java](https://entwickler.de/live-events/30-jahre-java/)
   - [[2025-04-01] JavaLand 2025](https://meine.doag.org/events/javaland/2025/agenda/#agendaId.5188)
-  - [[2025-11-04] XtremeJ 2025](https://xtremej.dev/2025/) 
+  - [[2025-07-10] Java Forum Stuttgart 2025](https://www.java-forum-stuttgart.de/vortraege/stream-gatherers-schreibe-deine-eigenen-stream-operationen/)
+  - [[2025-11-25] XtremeJ 2025](https://xtremej.dev/2025/) 
