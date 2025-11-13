@@ -3,7 +3,6 @@ package eu.happycoders.stream_gatherers.demo_parallel;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static java.io.IO.println;
 
 /// This class is not thread-safe!
 class StageStatistics {
@@ -22,10 +21,10 @@ class StageStatistics {
   }
 
   void print() {
-    println();
-    println(stageName);
-    println("# of threads  ->  # of runs");
-    countersByNumberOfThreads.forEach((key, counter) -> println(
+    IO.println();
+    IO.println(stageName);
+    IO.println("# of threads  ->  # of runs");
+    countersByNumberOfThreads.forEach((key, counter) -> IO.println(
         "%-13s ->  %4d (%5.2f %%)".formatted(key, counter.count, 100.0 * counter.count / numberOfRuns)));
   }
 }

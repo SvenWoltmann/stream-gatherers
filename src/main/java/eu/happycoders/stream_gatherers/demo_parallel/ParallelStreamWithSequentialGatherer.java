@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import static java.io.IO.println;
-
 class ParallelStreamWithSequentialGatherer {
 
   private static final int NUMBER_OF_RUNS = 10_000;
@@ -27,14 +25,14 @@ class ParallelStreamWithSequentialGatherer {
       medianCalculator.add(result.totalTimeNanos());
     }
 
-    println("\n---------- Overall statistics ----------");
-    println("Median of all round times: %.1f µs".formatted(medianCalculator.getMedian() / 1_000.0));
+    IO.println("\n---------- Overall statistics ----------");
+    IO.println("Median of all round times: %.1f µs".formatted(medianCalculator.getMedian() / 1_000.0));
     statisticsStage1.print();
     statisticsStage2.print();
   }
 
   private Result runTest(int i, List<Integer> ints) {
-    println("\n---------- Round %d ----------".formatted(i));
+    IO.println("\n---------- Round %d ----------".formatted(i));
 
     ThreadLocal<Counter> threadLocalCounterStage1 = ThreadLocal.withInitial(Counter::new);
 
@@ -61,9 +59,9 @@ class ParallelStreamWithSequentialGatherer {
     Set<String> threadNamesStage2 = new HashSet<>();
 
     if (PRINT_RESULTS_OF_EACH_RUN) {
-      println("list:");
+      IO.println("list:");
       for (var element : list) {
-        println("  " + element);
+        IO.println("  " + element);
       }
     }
 
@@ -72,9 +70,9 @@ class ParallelStreamWithSequentialGatherer {
       threadNamesStage2.add(element.threadNameGatherStage());
     }
 
-    println("Number of threads stage 1, parallel   mapping:  %2d (%s)"
+    IO.println("Number of threads stage 1, parallel   mapping:  %2d (%s)"
         .formatted(threadNamesStage1.size(), threadNamesStage1));
-    println("Number of threads stage 2, sequential mapping:  %2d (%s)"
+    IO.println("Number of threads stage 2, sequential mapping:  %2d (%s)"
         .formatted(threadNamesStage2.size(), threadNamesStage2));
 
     return new Result(threadNamesStage1, threadNamesStage2, time);
